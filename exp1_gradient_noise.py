@@ -261,6 +261,16 @@ def main():
     with open(json_path, "w") as f:
         json.dump(summary, f, indent=2)
 
+    tracked_path = None
+    if tracked_by_b is not None:
+        tracked_path = os.path.join(args.out_dir, f"exp1_{stage}_tracked.npz")
+        np.savez(
+            tracked_path,
+            tracked=tracked_by_b.numpy(),
+            g_tracked=g[track_idx].detach().cpu().numpy(),
+            track_idx=track_idx.detach().cpu().numpy(),
+        )
+
     # ---- plot ----
     os.makedirs(args.plot_dir, exist_ok=True)
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.6))
@@ -316,6 +326,8 @@ def main():
 
     print(f"\nsaved: {csv_path}")
     print(f"saved: {json_path}")
+    if tracked_path:
+        print(f"saved: {tracked_path}")
     print(f"saved: {plot_path}")
     print(f"total time: {time.time() - t0:.1f}s")
 
